@@ -1,53 +1,24 @@
-import {
-  BlockBlobClient,
-  ContainerClient,
-  StorageSharedKeyCredential,
-} from "@azure/storage-blob";
 import { createCustomRunner, initEnv } from "nx-remotecache-custom";
+import { Storage } from "@google-cloud/storage";
 
-const ENV_CONNECTION_STRING = "NXCACHE_AZURE_CONNECTION_STRING";
-const ENV_ACCOUNT_KEY = "NXCACHE_AZURE_ACCOUNT_KEY";
-const ENV_ACCOUNT_NAME = "NXCACHE_AZURE_ACCOUNT_NAME";
-const ENV_CONTAINER = "NXCACHE_AZURE_CONTAINER";
-const ENV_AZURE_URL = "NXCACHE_AZURE_URL";
-const ENV_SAS_URL = "NXCACHE_AZURE_SAS_URL";
+const ENV_GCP_BUCKET_URL = "gs://";
 
 const getEnv = (key: string) => process.env[key];
 
-function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions) {
-  const connectionString =
-    getEnv(ENV_CONNECTION_STRING) ?? options.connectionString;
-  const accountKey = getEnv(ENV_ACCOUNT_KEY) ?? options.accountKey;
-  const accountName = getEnv(ENV_ACCOUNT_NAME) ?? options.accountName;
-  const container = getEnv(ENV_CONTAINER) ?? options.container;
-  const sasUrl = getEnv(ENV_SAS_URL) ?? options.sasUrl;
+async function getGCPFileClient(filename: string, options: AzureBlobRunnerOptions) {
+  const bucketURL = process.env.GCP_BUCKET_URL;
+  const storageClient = new Storage();
+  const bucket = storageClient.bucket(bucketURL);
+  const bucketFile = bucket.file(filename);
 
-  if(sasUrl) {
-    return new ContainerClient(sasUrl).getBlockBlobClient(filename);
-  }
 
-  if (!container) {
+  if (!await bucket.exists()) {
     throw Error(
-      "Did not pass valid container. Supply the container either via env or nx.json."
+      `The given Bucket ${bucketURL} does not exist`
     );
   }
 
-  if (connectionString) {
-    return new BlockBlobClient(connectionString, container, filename);
-  }
-
-  if (accountKey && accountName) {
-    const defaultUrl = `https://${accountName}.blob.core.windows.net`;
-    const basePath = getEnv(ENV_AZURE_URL) ?? options.azureUrl ?? defaultUrl;
-    const fullUrl = `${basePath}/${container}/${filename}`;
-
-    const credential = new StorageSharedKeyCredential(accountName, accountKey);
-    return new BlockBlobClient(fullUrl, credential);
-  }
-
-  throw Error(
-    `Did not pass valid credentials. Supply them either via env or nx.json.`
-  );
+  return bucketFile;
 }
 
 interface AzureBlobRunnerOptions {
@@ -61,13 +32,13 @@ interface AzureBlobRunnerOptions {
 
 export default createCustomRunner<AzureBlobRunnerOptions>(async (options) => {
   initEnv(options);
-  const blob = (filename: string) => getBlockBlobClient(filename, options);
+  const GCPFile = async (filename: string) => await getGCPFileClient(filename, options);
 
   return {
     name: "Azure Blob Storage",
-    fileExists: (filename) => blob(filename).exists(),
+    fileExists: async (filename) => (await GCPFile(filename)).exists(),
     retrieveFile: async (filename) =>
       (await blob(filename).download()).readableStreamBody!,
-    storeFile: (filename, stream) => blob(filename).uploadStream(stream),
+    storeFile: (filename, stream) => blob(filename).uploadStream(stream)
   };
 });
