@@ -1,7 +1,7 @@
 {
   "name": "nx-remotecache-gcp",
   "version": "1.0.0",
-  "description": "Remote caching for @nrwl/nx using Azure Blob Storage",
+  "description": "Remote caching for @nrwl/nx using Google Cloud Buckets",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
@@ -32,13 +32,13 @@
   },
   "homepage": "github.com/John98Zakaria/nx-remotecache-gcp#readme",
   "devDependencies": {
-    "@nrwl/workspace": "^15.9.2",
     "@types/node": "^18.16.0",
     "@types/yargs": "^17.0.24",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "@google-cloud/storage": "^6.9.5",
+    "@nrwl/workspace": "^15.9.2",
     "nx-remotecache-custom": "^3.0.0"
   },
   "packageManager": "yarn@3.5.0"
