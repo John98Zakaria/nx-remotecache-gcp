@@ -1,36 +1,42 @@
 [![npm package link](https://img.shields.io/npm/v/nx-remotecache-azure)](https://www.npmjs.com/package/nx-remotecache-azure)
 
-# nx-remotecache-azure
+# nx-remotecache-gcp
 
-A task runner for [@nrwl/nx](https://nx.dev) that uses an Azure Blob Storage as a remote cache. This enables all team members and CI servers to share a single cache. The concept and benefits of [computation caching](https://nx.dev/angular/guides/computation-caching) are explained in the NX documentation.
+A task runner for [@nrwl/nx](https://nx.dev) that uses a Google Cloud Storage bucket as a remote cache.
+This enables all team members and CI servers to share a single cache. 
+The concept and benefits of [Cache Task Results](https://nx.dev/core-features/cache-task-results) are explained in the Nx documentation.
 
 This package was built with [nx-remotecache-custom](https://www.npmjs.com/package/nx-remotecache-custom) 🙌
 
 ## Setup
 
-```
-npm install --save-dev nx-remotecache-azure
-```
+1. Add Nx to your workspace [Guide](https://nx.dev/getting-started/installation)
+2. Install this package as dev dependency.
+    ```shell
+    npm install --save-dev nx-remotecache-gcp
+    ```
+3. Authenticate to Google Cloud
+The user authenticating must have read/write access to the bucket as well as `storage.buckets.get` permission
+   1. Locally using google cloud CLI using `gcloud auth`
+   2. For Github actions use [google-github-actions/auth](https://github.com/google-github-actions/auth)
 
-| Parameter         | Description                                                             |  Environment Variable / .env       | `nx.json`          |
-| ----------------- | ----------------------------------------------------------------------- | ---------------------------------- | ------------------ |
-| Connection String | Connect to an Azure Storage blob via a single URL.                      | `NXCACHE_AZURE_CONNECTION_STRING` | `connectionString` |
-| Container SAS URL | Connect to an Azure Storage blob via a single container SAS URL.        | `NXCACHE_AZURE_SAS_URL`           | `sasUrl`           |
-| Account Name      | Use together with Account Key for Azure Credentials Authentication      | `NXCACHE_AZURE_ACCOUNT_NAME`      | `accountName`      |
-| Account Key       | Use together with Account Name for Azure Credentials Authentication     | `NXCACHE_AZURE_ACCOUNT_KEY`       | `accountKey`       |
-| Container         | Required. Specify which container should be used for storing the cache. | `NXCACHE_AZURE_CONTAINER`         | `container`        |
-| Azure URL         | Optional. Can be used to overwrite Azure URL for local debugging.       | `NXCACHE_AZURE_URL`               | `azureUrl`         |
+# Configuration
+
+Note: Environment variables have precedence over
+
+| Parameter      | Description                                   | Environment Variable / .env | `nx.json`        |
+|----------------|-----------------------------------------------|-----------------------------|------------------|
+| Google Project | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject ` |
+| Bucket Name    | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`     |
 
 ```json
 {
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx-remotecache-azure",
+      "runner": "nx-remotecache-gcp",
       "options": {
-        // All of the azure specific options can also be inserted via environment variables! ⬆️
-        "accountName": "MyAzureAccountName",
-        "accountKey": "my-azure-account-key-11223-22..",
-        "container": "nx",
+        "googleProject": "my-google-project-id",
+        "bucketName": "my-nx-cache-bucket",
         "cacheableOperations": ["build", "test", "lint", "e2e"]
       }
     }
@@ -43,42 +49,9 @@ npm install --save-dev nx-remotecache-azure
 Running tasks should now show the storage or retrieval from the remote cache:
 
 ```
-------------------------------------------------------------------------
-Built Angular Package
- - from: /Users/name/example-workspace/libs/example-lib
- - to:   /Users/name/example-workspace/dist/libs/example-lib
-------------------------------------------------------------------------
-------------------------------------------------------------------------
-Stored output to remote cache: Azure Blob Storage
-Hash: d3d2bea71ea0f3004304c5cc88cf91be50b02bb636ebbdfcc927626fd8edf1ae
-------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Remote cache hit: Google Cloud Bucket
+File: 1fb268062785d739b5a43c1e4032fd7731c6080e2249e87a00e568b3c41acf9c.tar.gz
+------------------------------------------------------------------------------
 ```
 
-## Advanced Configuration
-
-| Option       | Environment Variable / .env | Description                                                                                           |
-| ------------ | --------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `name`       | `NXCACHE_NAME`             | Set to provide task runner name for logging. Overrides name provided in implementation.               |
-| `verbose`    |                             | Set to receive full stack traces whenever errors occur. Best used for debugging. **Default:** `false` |
-| `silent`     |                             | Set to mute success and info logs. **Default:** `false`                                               |
-| `dotenv`     |                             | Set to `false` to disable reading `.env` into `process.env`. **Default:** `true`                      |
-| `dotenvPath` |                             | Set to read `.env` files from a different folder.                                                     |
-
-```json
-"tasksRunnerOptions": {
-  "default": {
-    "options": {
-      "name": "My Storage",
-      "verbose": true,
-      "silent": true
-    }
-  }
-}
-```
-
-## All Custom Runners
-
-| Runner                                                                     | Storage             |
-| -------------------------------------------------------------------------- | ------------------- |
-| [nx-remotecache-azure](https://www.npmjs.com/package/nx-remotecache-azure) |  Azure Blob Storage |
-| [nx-remotecache-minio](https://www.npmjs.com/package/nx-remotecache-minio) |  MinIO Storage      |
