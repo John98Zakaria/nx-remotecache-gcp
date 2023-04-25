@@ -10,7 +10,7 @@ This package was built with [nx-remotecache-custom](https://www.npmjs.com/packag
 
 ## Setup
 
-1. Add Nx to your workspace [Guide](https://nx.dev/getting-started/installation)
+1. Add Nx to your workspace [guide](https://nx.dev/getting-started/installation)
 2. Install this package as dev dependency.
     ```shell
     npm install --save-dev nx-remotecache-gcp
