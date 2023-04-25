@@ -1,14 +1,11 @@
 {
   "name": "nx-remotecache-gcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Remote caching for @nrwl/nx using Google Cloud Buckets",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup lib/index.ts --format cjs --dts",
-    "prepare": "yarn build",
-    "release": "yarn run build && cd dist && yarn publish && cd ..",
-    "link": "yarn run build && cd dist && yarn link -A . && cd .."
+    "build": "tsup lib/index.ts --format cjs --dts"
   },
   "repository": {
     "type": "git",
@@ -19,10 +16,9 @@
     "remote",
     "cache",
     "remotecache",
-    "azure",
-    "blob",
-    "storage",
-    "angular",
+    "google",
+    "buckets",
+    "gcs",
     "typescript"
   ],
   "author": "John Sorial",
@@ -51,5 +47,9 @@
     "@google-cloud/storage": "^6.9.5",
     "@nrwl/workspace": "^15.9.2",
     "nx-remotecache-custom": "^3.0.0"
-  }
+  },
+  "files": [
+    "dist/**",
+    "lib/**"
+  ]
 }
