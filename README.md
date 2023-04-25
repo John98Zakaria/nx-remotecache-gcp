@@ -24,10 +24,10 @@ The user authenticating must have read/write access to the bucket as well as `st
 
 Note: Environment variables have precedence over
 
-| Parameter      | Description                                   | Environment Variable / .env | `nx.json`        |
-|----------------|-----------------------------------------------|-----------------------------|------------------|
-| Google Project | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject ` |
-| Bucket Name    | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`     |
+| Parameter      | Description                                   | Environment Variable / .env | `nx.json`       |
+|----------------|-----------------------------------------------|-----------------------------|-----------------|
+| Google Project | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject` |
+| Bucket Name    | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`    |
 
 ```json
 {
