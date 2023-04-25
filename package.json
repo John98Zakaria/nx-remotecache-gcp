@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc && cp package.json dist/package.json && cp README.md dist/README.md && cp CHANGELOG.md dist/CHANGELOG.md",
+    "build": "tsup lib/index.ts --format cjs --dts",
     "prepare": "yarn build",
     "release": "yarn run build && cd dist && yarn publish && cd ..",
     "link": "yarn run build && cd dist && yarn link -A . && cd .."
