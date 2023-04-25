@@ -1,0 +1,26 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "standard-with-typescript",
+    "prettier"
+  ],
+  "overrides": [
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "project": [
+      "tsconfig.json"
+    ]
+  },
+  "rules": {
+    "indent": [
+      "warn",
+      4
+    ],
+    "@typescript-eslint/explicit-function-return-type": "off"
+  }
+}

@@ -1,73 +1,41 @@
+import { createCustomRunner, initEnv } from 'nx-remotecache-custom';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
+import type { GCPBucketIdentifier } from './gcp-specific';
 import {
-  BlockBlobClient,
-  ContainerClient,
-  StorageSharedKeyCredential,
-} from "@azure/storage-blob";
-import { createCustomRunner, initEnv } from "nx-remotecache-custom";
+    bucketFileExists,
+    buildConfiguration,
+    constructGCSFileRefrence,
+    getGCSBucket,
+    verifyConfiguration,
+} from './gcp-specific';
+import type { RemoteCacheImplementation } from 'nx-remotecache-custom/types/remote-cache-implementation';
 
-const ENV_CONNECTION_STRING = "NXCACHE_AZURE_CONNECTION_STRING";
-const ENV_ACCOUNT_KEY = "NXCACHE_AZURE_ACCOUNT_KEY";
-const ENV_ACCOUNT_NAME = "NXCACHE_AZURE_ACCOUNT_NAME";
-const ENV_CONTAINER = "NXCACHE_AZURE_CONTAINER";
-const ENV_AZURE_URL = "NXCACHE_AZURE_URL";
-const ENV_SAS_URL = "NXCACHE_AZURE_SAS_URL";
+export default createCustomRunner<Partial<GCPBucketIdentifier>>(
+    async (options): Promise<RemoteCacheImplementation> => {
+        initEnv(options);
+        const configuration = buildConfiguration(options);
+        const verifiedConfiguration = verifyConfiguration(configuration);
+        const bucket = await getGCSBucket(verifiedConfiguration);
 
-const getEnv = (key: string) => process.env[key];
-
-function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions) {
-  const connectionString =
-    getEnv(ENV_CONNECTION_STRING) ?? options.connectionString;
-  const accountKey = getEnv(ENV_ACCOUNT_KEY) ?? options.accountKey;
-  const accountName = getEnv(ENV_ACCOUNT_NAME) ?? options.accountName;
-  const container = getEnv(ENV_CONTAINER) ?? options.container;
-  const sasUrl = getEnv(ENV_SAS_URL) ?? options.sasUrl;
-
-  if(sasUrl) {
-    return new ContainerClient(sasUrl).getBlockBlobClient(filename);
-  }
-
-  if (!container) {
-    throw Error(
-      "Did not pass valid container. Supply the container either via env or nx.json."
-    );
-  }
-
-  if (connectionString) {
-    return new BlockBlobClient(connectionString, container, filename);
-  }
-
-  if (accountKey && accountName) {
-    const defaultUrl = `https://${accountName}.blob.core.windows.net`;
-    const basePath = getEnv(ENV_AZURE_URL) ?? options.azureUrl ?? defaultUrl;
-    const fullUrl = `${basePath}/${container}/${filename}`;
-
-    const credential = new StorageSharedKeyCredential(accountName, accountKey);
-    return new BlockBlobClient(fullUrl, credential);
-  }
-
-  throw Error(
-    `Did not pass valid credentials. Supply them either via env or nx.json.`
-  );
-}
-
-interface AzureBlobRunnerOptions {
-  connectionString: string;
-  accountKey: string;
-  accountName: string;
-  container: string;
-  azureUrl: string;
-  sasUrl: string;
-}
-
-export default createCustomRunner<AzureBlobRunnerOptions>(async (options) => {
-  initEnv(options);
-  const blob = (filename: string) => getBlockBlobClient(filename, options);
-
-  return {
-    name: "Azure Blob Storage",
-    fileExists: (filename) => blob(filename).exists(),
-    retrieveFile: async (filename) =>
-      (await blob(filename).download()).readableStreamBody!,
-    storeFile: (filename, stream) => blob(filename).uploadStream(stream),
-  };
-});
+        return {
+            name: 'Google Cloud Bucket',
+            fileExists: async (filename) => {
+                const bucketFile = constructGCSFileRefrence(bucket, filename);
+                return await bucketFileExists(bucketFile);
+            },
+            retrieveFile: async (filename) => {
+                const bucketFile = constructGCSFileRefrence(bucket, filename);
+                const downloadedFile = bucketFile.download();
+                return Readable.from(await downloadedFile);
+            },
+            storeFile: async (filename, stream) => {
+                const uploadStream = constructGCSFileRefrence(
+                    bucket,
+                    filename
+                ).createWriteStream();
+                await pipeline(stream, uploadStream);
+            },
+        };
+    }
+);
