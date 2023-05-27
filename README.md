@@ -3,8 +3,9 @@
 # nx-remotecache-gcp
 
 A task runner for [@nrwl/nx](https://nx.dev) that uses a Google Cloud Storage bucket as a remote cache.
-This enables all team members and CI servers to share a single cache. 
-The concept and benefits of [Cache Task Results](https://nx.dev/core-features/cache-task-results) are explained in the Nx documentation.
+This enables all team members and CI servers to share a single cache.
+The concept and benefits of [Cache Task Results](https://nx.dev/core-features/cache-task-results) are explained in the
+Nx documentation.
 
 This package was built with [nx-remotecache-custom](https://www.npmjs.com/package/nx-remotecache-custom) 🙌
 
@@ -16,13 +17,27 @@ This package was built with [nx-remotecache-custom](https://www.npmjs.com/packag
     npm install --save-dev nx-remotecache-gcp
     ```
 3. Authenticate to Google Cloud
-The user authenticating must have read/write access to the bucket as well as `storage.buckets.get` permission
-   1. Locally using google cloud CLI using `gcloud auth`
-   2. For Github actions use [google-github-actions/auth](https://github.com/google-github-actions/auth)
+   The user authenticating must have read/write access to the bucket as well as `storage.buckets.get` permission
+    1. Locally using google cloud CLI using `gcloud auth`
+    2. For Github actions use [google-github-actions/auth](https://github.com/google-github-actions/auth)
+
+4. Create a Google bucket to store the cache in
+
+### Creating a service account with the right permissions
+
+To authenticate on CI it is recommended to create a service account that only has the required
+permissions.
+
+1. Create a custom role with only the `storage.buckets.get` permission
+
+2. Create a service account with the custom Role and limit it only manage the nx-cache bucket using
+   this CEL Expression `projects/_/buckets/<BUCKET_NAME>`
+
+3. 3Add Object Admin to the bucket from the page of the Bucket
 
 # Configuration
 
-Note: Environment variables have precedence over
+Note: Environment variables have precedence over configured variables
 
 | Parameter      | Description                                   | Environment Variable / .env | `nx.json`       |
 |----------------|-----------------------------------------------|-----------------------------|-----------------|
@@ -37,7 +52,12 @@ Note: Environment variables have precedence over
       "options": {
         "googleProject": "my-google-project-id",
         "bucketName": "my-nx-cache-bucket",
-        "cacheableOperations": ["build", "test", "lint", "e2e"]
+        "cacheableOperations": [
+          "build",
+          "test",
+          "lint",
+          "e2e"
+        ]
       }
     }
   }
