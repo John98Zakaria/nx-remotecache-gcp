@@ -50,23 +50,23 @@ Additionally all parameters defined in [nx-remotecache-custom](https://www.npmjs
 
 ```json
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx-remotecache-gcp",
-      "options": {
-        "googleProject": "my-google-project-id",
-        "bucketName": "my-nx-cache-bucket",
-         "read": true,
-         "write": false,
-        "cacheableOperations": [
-          "build",
-          "test",
-          "lint",
-          "e2e"
-        ]
+   "tasksRunnerOptions": {
+      "default": {
+         "runner": "nx-remotecache-gcp",
+         "options": {
+            "googleProject": "my-google-project-id",
+            "bucketName": "my-nx-cache-bucket",
+            "read": true,
+            "write": false,
+            "cacheableOperations": [
+               "build",
+               "test",
+               "lint",
+               "e2e"
+            ]
+         }
       }
-    }
-  }
+   }
 }
 ```
 
