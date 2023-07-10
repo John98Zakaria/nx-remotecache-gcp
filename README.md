@@ -31,18 +31,22 @@ permissions.
 1. Create a custom role with only the `storage.buckets.get` permission
 
 2. Create a service account with the custom Role and limit it only manage the nx-cache bucket using
-   this CEL Expression `projects/_/buckets/<BUCKET_NAME>`
+   this CEL Expression `resource.name.startsWith(\"projects/_/buckets/<nx_cache_bucket.name>\")`
 
-3. 3Add Object Admin to the bucket from the page of the Bucket
+3. Add Object Admin to the bucket from the page of the Bucket
 
 # Configuration
 
-Note: Environment variables have precedence over configured variables
+Note: Environment variables have precedence over configured variables 
 
-| Parameter      | Description                                   | Environment Variable / .env | `nx.json`       |
-|----------------|-----------------------------------------------|-----------------------------|-----------------|
-| Google Project | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject` |
-| Bucket Name    | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`    |
+Additionally all parameters defined in [nx-remotecache-custom](https://www.npmjs.com/package/nx-remotecache-custom) are valid here
+
+| Parameter              | Description                                   | Environment Variable / .env | `nx.json`            |
+|------------------------|-----------------------------------------------|-----------------------------|----------------------|
+| Google Project         | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject`      |
+| Bucket Name            | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`         |
+| Read from Remote Cache | Allow reading from the the remote cache       | `NXCACHE_READ`              | `read` (true/false)  |
+| Write to Remote Cache  | Allow writing to the the remote cache         | `NXCACHE_WRITE`             | `write` (true/false) |
 
 ```json
 {
@@ -52,6 +56,8 @@ Note: Environment variables have precedence over configured variables
       "options": {
         "googleProject": "my-google-project-id",
         "bucketName": "my-nx-cache-bucket",
+         "read": true,
+         "write": false,
         "cacheableOperations": [
           "build",
           "test",

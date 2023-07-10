@@ -2256,10 +2256,10 @@ npm-run-path@^4.0.1:
   dependencies:
     path-key "^3.0.0"
 
-nx-remotecache-custom@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/nx-remotecache-custom/-/nx-remotecache-custom-4.0.0.tgz#7dc5d60b4d11ca4835081ce05f20f0c410a6c531"
-  integrity sha512-ylKokrs8W9BkAUzctDsLyqiuw+TYZbGn7mxQL238xcsTrQOIZrGrS1hXSOftP5G35a4qUIMXV9se/HZjgzK3CA==
+nx-remotecache-custom@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/nx-remotecache-custom/-/nx-remotecache-custom-4.1.0.tgz#5a67b99e03abff04423f65d4db4b256cdc13b432"
+  integrity sha512-rolOx8I1VYS+ESGD5NM9Tx/uw2lu7WHp9Mkj5A4yeXoKeNQviW32drL0yKIN6brqHkd9pvNNcYrgYP7HdBxaxg==
   dependencies:
     chalk "^4.1.2"
     dotenv "^16.0.3"
