@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/John98Zakaria/nx-remotecache-gcp"
+    "url": "git+https://github.com/John98Zakaria/nx-remotecache-gcp.git"
   },
   "keywords": [
     "nx",
