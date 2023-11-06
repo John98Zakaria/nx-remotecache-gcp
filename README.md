@@ -9,6 +9,13 @@ Nx documentation.
 
 This package was built with [nx-remotecache-custom](https://www.npmjs.com/package/nx-remotecache-custom) 🙌
 
+## Compatability
+
+| Nx        | Remote Cache |
+|-----------|--------------|
+| >= 16.9.0 | >= 2.0.0     |
+| < 16.9.0  | < 1.2.1      |
+
 ## Setup
 
 1. Add Nx to your workspace [guide](https://nx.dev/getting-started/installation)
