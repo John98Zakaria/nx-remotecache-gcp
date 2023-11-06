@@ -1,6 +1,6 @@
 {
   "name": "nx-remotecache-gcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Remote caching for @nrwl/nx using Google Cloud Buckets",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -39,11 +39,15 @@
     "prettier": "^3.0.3",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
-    "yarn-deduplicate": "^6.0.2"
+    "yarn-deduplicate": "^6.0.2",
+    "@nx/workspace": "^17.0.3"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.5.0",
     "nx-remotecache-custom": "^5.0.1"
+  },
+  "peerDependencies": {
+    "@nx/workspace": ">=16.9.0"
   },
   "files": [
     "dist/**",
