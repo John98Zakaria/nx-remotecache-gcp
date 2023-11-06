@@ -5,7 +5,7 @@ import type { GCPBucketIdentifier } from './gcp-specific';
 import {
     bucketFileExists,
     buildConfiguration,
-    constructGCSFileRefrence,
+    constructGCSFileReference,
     getGCSBucket,
     verifyConfiguration,
 } from './gcp-specific';
@@ -21,16 +21,16 @@ export default createCustomRunner<Partial<GCPBucketIdentifier>>(
         return {
             name: 'Google Cloud Bucket',
             fileExists: async (filename) => {
-                const bucketFile = constructGCSFileRefrence(bucket, filename);
+                const bucketFile = constructGCSFileReference(bucket, filename);
                 return await bucketFileExists(bucketFile);
             },
             retrieveFile: async (filename) => {
-                const bucketFile = constructGCSFileRefrence(bucket, filename);
+                const bucketFile = constructGCSFileReference(bucket, filename);
                 const downloadedFile = bucketFile.download();
                 return Readable.from(await downloadedFile);
             },
             storeFile: async (filename, stream) => {
-                const uploadStream = constructGCSFileRefrence(
+                const uploadStream = constructGCSFileReference(
                     bucket,
                     filename
                 ).createWriteStream();

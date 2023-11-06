@@ -72,11 +72,11 @@ export async function getGCSBucket(configuration: GCPBucketIdentifier) {
 }
 
 /**
- * Constructs a refrence to a Google bucket file
+ * Constructs a reference to a Google bucket file
  * @param bucket
  * @param filename
  */
-export function constructGCSFileRefrence(bucket: Bucket, filename: string) {
+export function constructGCSFileReference(bucket: Bucket, filename: string) {
     return bucket.file(filename);
 }
 
