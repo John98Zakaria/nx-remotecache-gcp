@@ -32,10 +32,10 @@ export default createCustomRunner<Partial<GCPBucketIdentifier>>(
             storeFile: async (filename, stream) => {
                 const uploadStream = constructGCSFileReference(
                     bucket,
-                    filename
+                    filename,
                 ).createWriteStream();
                 await pipeline(stream, uploadStream);
             },
         };
-    }
+    },
 );

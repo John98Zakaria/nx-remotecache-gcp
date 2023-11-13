@@ -1,22 +1,34 @@
 import { type Bucket, type File, Storage } from '@google-cloud/storage';
+import { StorageOptions } from '@google-cloud/storage/build/cjs/src/storage';
+import { readFile } from 'fs/promises';
 
-export interface GCPBucketIdentifier {
+export type GCPBucketIdentifier = {
     googleProject: string;
     bucketName: string;
-}
+    googleApplicationCredentialsPath: string | undefined;
+};
 
 /**
  * Combines the environment variable configuration with the nx.json config
  * @param options object containing the nx runner configuration
  */
 export function buildConfiguration(
-    options: Partial<GCPBucketIdentifier>
+    options: Partial<GCPBucketIdentifier>,
 ): Partial<GCPBucketIdentifier> {
     const bucketName =
         process.env.NXCACHE_GCP_BUCKET_NAME ?? options?.bucketName;
     const projectId = process.env.NXCACHE_GCP_PROJECT ?? options?.googleProject;
+    // If none was provided, we will let the Google library figure do its logic in finding the credentials
+    // https://cloud.google.com/docs/authentication/application-default-credentials
+    const googleApplicationCredentialsPath =
+        process.env.NX_GOOGLE_APPLICATION_CREDENTIALS_PATH ??
+        options?.googleApplicationCredentialsPath;
 
-    return { bucketName, googleProject: projectId };
+    return {
+        bucketName,
+        googleProject: projectId,
+        googleApplicationCredentialsPath,
+    };
 }
 
 /**
@@ -24,7 +36,7 @@ export function buildConfiguration(
  * @param options object containing the nx runner configuration
  * */
 export function verifyConfiguration(
-    options: Partial<GCPBucketIdentifier>
+    options: Partial<GCPBucketIdentifier>,
 ): GCPBucketIdentifier {
     const bucketName = options?.bucketName;
     const projectId = options?.googleProject;
@@ -33,18 +45,23 @@ export function verifyConfiguration(
         throw new Error(
             'You forgot to specify a google bucket name,' +
                 ' please check your nx.json or ' +
-                'set the environment variable NXCACHE_GCP_BUCKET_NAME'
+                'set the environment variable NXCACHE_GCP_BUCKET_NAME',
         );
     }
     if (projectId === undefined) {
         throw new Error(
             'You forgot to specify a google project,' +
                 ' please check your nx.json or ' +
-                'set the environment variable NXCACHE_GCP_BUCKET_NAME'
+                'set the environment variable NXCACHE_GCP_BUCKET_NAME',
         );
     }
 
-    return { bucketName, googleProject: projectId };
+    return {
+        bucketName,
+        googleProject: projectId,
+        googleApplicationCredentialsPath:
+            options.googleApplicationCredentialsPath,
+    };
 }
 
 /**
@@ -54,13 +71,41 @@ export function verifyConfiguration(
 export async function getGCSBucket(configuration: GCPBucketIdentifier) {
     const bucketName =
         process.env.NXCACHE_GCP_BUCKET_NAME ?? configuration.bucketName;
-    const storageClient = new Storage({
+    const googleStorageOptions: StorageOptions = {
         projectId: configuration.googleProject,
         retryOptions: {
             autoRetry: true,
             maxRetries: 4,
         },
-    });
+    };
+
+    if (configuration.googleApplicationCredentialsPath) {
+        try {
+            googleStorageOptions.credentials = JSON.parse(
+                await readFile(
+                    configuration.googleApplicationCredentialsPath,
+                    'utf-8',
+                ),
+            );
+        } catch (error) {
+            if (
+                error instanceof Error &&
+                'code' in error &&
+                error.code === 'ENOENT'
+            ) {
+                throw Error(
+                    `Was unable to find the authentication file located at ${configuration.googleApplicationCredentialsPath}`,
+                );
+            }
+            if (error instanceof SyntaxError) {
+                throw Error(
+                    `The provided file at ${configuration.googleApplicationCredentialsPath} does not contain valid JSON`,
+                );
+            }
+            throw error;
+        }
+    }
+    const storageClient = new Storage(googleStorageOptions);
     const bucket = storageClient.bucket(bucketName);
 
     const [bucketExists] = await bucket.exists();

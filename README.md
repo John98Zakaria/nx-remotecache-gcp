@@ -13,7 +13,7 @@ This package was built with [nx-remotecache-custom](https://www.npmjs.com/packag
 
 | Nx        | Remote Cache |
 |-----------|--------------|
-| >= 16.9.0 | >= 2.0.0     |
+| >= 16.9.0 | >= 2.0.2     |
 | < 16.9.0  | < 1.2.1      |
 
 ## Setup
@@ -27,6 +27,7 @@ This package was built with [nx-remotecache-custom](https://www.npmjs.com/packag
    The user authenticating must have read/write access to the bucket as well as `storage.buckets.get` permission
     1. Locally using google cloud CLI using `gcloud auth`
     2. For Github actions use [google-github-actions/auth](https://github.com/google-github-actions/auth)
+    3. You may provide `NX_GOOGLE_APPLICATION_CREDENTIALS_PATH` and point to your own Google service account credentials.
 
 4. Create a Google bucket to store the cache in
 
@@ -48,12 +49,13 @@ Note: Environment variables have precedence over configured variables
 
 Additionally all parameters defined in [nx-remotecache-custom](https://www.npmjs.com/package/nx-remotecache-custom) are valid here
 
-| Parameter              | Description                                   | Environment Variable / .env | `nx.json`            |
-|------------------------|-----------------------------------------------|-----------------------------|----------------------|
-| Google Project         | Project Name in which the Bucket resides      | `NXCACHE_GCP_PROJECT`       | `googleProject`      |
-| Bucket Name            | Bucket name in which the cache will be stored | `NXCACHE_GCP_BUCKET_NAME`   | `bucketName`         |
-| Read from Remote Cache | Allow reading from the the remote cache       | `NXCACHE_READ`              | `read` (true/false)  |
-| Write to Remote Cache  | Allow writing to the the remote cache         | `NXCACHE_WRITE`             | `write` (true/false) |
+| Parameter                   | Description                                     | Environment Variable / .env              | `nx.json`                          |
+|-----------------------------|-------------------------------------------------|------------------------------------------|------------------------------------|
+| Google Project              | Project Name in which the Bucket resides        | `NXCACHE_GCP_PROJECT`                    | `googleProject`                    |
+| Bucket Name                 | Bucket name in which the cache will be stored   | `NXCACHE_GCP_BUCKET_NAME`                | `bucketName`                       |
+| Read from Remote Cache      | Allow reading from the the remote cache         | `NXCACHE_READ`                           | `read` (true/false)                |
+| Write to Remote Cache       | Allow writing to the the remote cache           | `NXCACHE_WRITE`                          | `write` (true/false)               |
+| Credentials path (optional) | Provide your own google application credentials | `NX_GOOGLE_APPLICATION_CREDENTIALS_PATH` | `googleApplicationCredentialsPath` |
 
 ```json
 {
