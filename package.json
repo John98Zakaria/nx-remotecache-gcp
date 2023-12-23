@@ -29,22 +29,21 @@
   "homepage": "github.com/John98Zakaria/nx-remotecache-gcp#readme",
   "devDependencies": {
     "@types/node": "^18.16.20",
-    "@types/yargs": "^17.0.29",
-    "@typescript-eslint/eslint-plugin": "^6.9.1",
-    "@typescript-eslint/parser": "^6.9.1",
-    "eslint": "^8.53.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.29.0",
+    "@types/yargs": "^17.0.32",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-promise": "^6.0.0",
-    "prettier": "^3.0.3",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2",
-    "yarn-deduplicate": "^6.0.2",
-    "@nx/workspace": "^17.0.3"
+    "prettier": "^3.1.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "yarn-deduplicate": "^6.0.2"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.5.0",
-    "nx-remotecache-custom": "^5.0.1",
+    "@google-cloud/storage": "^7.7.0",
+    "nx-remotecache-custom": "^17.0.0",
     "@nx/workspace": "^17.0.3"
   },
   "peerDependencies": {
