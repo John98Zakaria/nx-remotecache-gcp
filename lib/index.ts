@@ -29,12 +29,12 @@ export default createCustomRunner<Partial<GCPBucketIdentifier>>(
                 const downloadedFile = bucketFile.download();
                 return Readable.from(await downloadedFile);
             },
-            storeFile: async (filename, stream) => {
+            storeFile: async (filename, fileStream) => {
                 const uploadStream = constructGCSFileReference(
                     bucket,
                     filename,
                 ).createWriteStream();
-                await pipeline(stream, uploadStream);
+                await pipeline(fileStream, uploadStream);
             },
         };
     },
