@@ -19,7 +19,8 @@
     "google",
     "buckets",
     "gcs",
-    "typescript"
+    "typescript",
+    "gcp"
   ],
   "author": "John Sorial",
   "license": "MIT",
