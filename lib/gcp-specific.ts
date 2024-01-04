@@ -1,6 +1,7 @@
 import { type Bucket, type File, Storage } from '@google-cloud/storage';
 import { StorageOptions } from '@google-cloud/storage/build/cjs/src/storage';
 import { readFile } from 'fs/promises';
+import type { CustomRunnerOptions } from 'nx-remotecache-custom/types/custom-runner-options';
 
 export type GCPBucketIdentifier = {
     googleProject: string;
@@ -8,13 +9,18 @@ export type GCPBucketIdentifier = {
     googleApplicationCredentialsPath: string | undefined;
 };
 
+export type PluginConfig = GCPBucketIdentifier & {
+    read: boolean;
+    write: boolean;
+};
+
 /**
  * Combines the environment variable configuration with the nx.json config
  * @param options object containing the nx runner configuration
  */
 export function buildConfiguration(
-    options: Partial<GCPBucketIdentifier>,
-): Partial<GCPBucketIdentifier> {
+    options: Partial<GCPBucketIdentifier & CustomRunnerOptions>,
+): Partial<PluginConfig> {
     const bucketName =
         process.env.NXCACHE_GCP_BUCKET_NAME ?? options?.bucketName;
     const projectId = process.env.NXCACHE_GCP_PROJECT ?? options?.googleProject;
@@ -28,6 +34,8 @@ export function buildConfiguration(
         bucketName,
         googleProject: projectId,
         googleApplicationCredentialsPath,
+        read: options.read ?? true,
+        write: options.write ?? true,
     };
 }
 
@@ -35,9 +43,9 @@ export function buildConfiguration(
  * Verifies that all required configurations have been provided
  * @param options object containing the nx runner configuration
  * */
-export function verifyConfiguration(
-    options: Partial<GCPBucketIdentifier>,
-): GCPBucketIdentifier {
+export function typeCheckConfiguration(
+    options: Partial<PluginConfig>,
+): PluginConfig {
     const bucketName = options?.bucketName;
     const projectId = options?.googleProject;
 
@@ -61,14 +69,16 @@ export function verifyConfiguration(
         googleProject: projectId,
         googleApplicationCredentialsPath:
             options.googleApplicationCredentialsPath,
+        read: options.read ?? true,
+        write: options.write ?? true,
     };
 }
 
 /**
- * Gets a reference to the Google bucket and verifies its existence
+ * Gets a reference to the Google bucket and verifies its existence unless reads and writes are disabled
  * @param configuration a configuration identifying the Google bucket
  */
-export async function getGCSBucket(configuration: GCPBucketIdentifier) {
+export async function getGCSBucket(configuration: PluginConfig) {
     const bucketName =
         process.env.NXCACHE_GCP_BUCKET_NAME ?? configuration.bucketName;
     const googleStorageOptions: StorageOptions = {
@@ -79,7 +89,10 @@ export async function getGCSBucket(configuration: GCPBucketIdentifier) {
         },
     };
 
-    if (configuration.googleApplicationCredentialsPath) {
+    // If reading or writing is enabled, verify the integrity of the configuration
+    const verifyGcpEntities = configuration.read || configuration.write;
+
+    if (configuration.googleApplicationCredentialsPath && verifyGcpEntities) {
         try {
             googleStorageOptions.credentials = JSON.parse(
                 await readFile(
@@ -108,7 +121,7 @@ export async function getGCSBucket(configuration: GCPBucketIdentifier) {
     const storageClient = new Storage(googleStorageOptions);
     const bucket = storageClient.bucket(bucketName);
 
-    const [bucketExists] = await bucket.exists();
+    const [bucketExists] = verifyGcpEntities ? await bucket.exists() : [true];
     if (!bucketExists) {
         throw Error(`The given Bucket ${bucketName} does not exist`);
     }

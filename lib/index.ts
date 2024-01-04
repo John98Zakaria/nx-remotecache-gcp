@@ -7,7 +7,7 @@ import {
     buildConfiguration,
     constructGCSFileReference,
     getGCSBucket,
-    verifyConfiguration,
+    typeCheckConfiguration,
 } from './gcp-specific';
 import type { RemoteCacheImplementation } from 'nx-remotecache-custom/types/remote-cache-implementation';
 
@@ -15,8 +15,8 @@ export default createCustomRunner<Partial<GCPBucketIdentifier>>(
     async (options): Promise<RemoteCacheImplementation> => {
         initEnv(options);
         const configuration = buildConfiguration(options);
-        const verifiedConfiguration = verifyConfiguration(configuration);
-        const bucket = await getGCSBucket(verifiedConfiguration);
+        const typeCheckedConfiguration = typeCheckConfiguration(configuration);
+        const bucket = await getGCSBucket(typeCheckedConfiguration);
 
         return {
             name: 'Google Cloud Bucket',
