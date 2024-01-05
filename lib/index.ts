@@ -10,28 +10,41 @@ import {
     verifyConfiguration,
 } from './gcp-specific';
 import type { RemoteCacheImplementation } from 'nx-remotecache-custom/types/remote-cache-implementation';
+import type { Bucket } from '@google-cloud/storage';
 
 export default createCustomRunner<Partial<GCPBucketIdentifier>>(
     async (options): Promise<RemoteCacheImplementation> => {
+        let bucket: Bucket | undefined;
         initEnv(options);
         const configuration = buildConfiguration(options);
         const verifiedConfiguration = verifyConfiguration(configuration);
-        const bucket = await getGCSBucket(verifiedConfiguration);
+        const getBucket = async () => {
+            if (!bucket) {
+                bucket = await getGCSBucket(verifiedConfiguration);
+            }
+            return bucket;
+        };
 
         return {
             name: 'Google Cloud Bucket',
             fileExists: async (filename) => {
-                const bucketFile = constructGCSFileReference(bucket, filename);
+                const bucketFile = constructGCSFileReference(
+                    await getBucket(),
+                    filename,
+                );
                 return await bucketFileExists(bucketFile);
             },
             retrieveFile: async (filename) => {
-                const bucketFile = constructGCSFileReference(bucket, filename);
+                const bucketFile = constructGCSFileReference(
+                    await getBucket(),
+                    filename,
+                );
                 const downloadedFile = bucketFile.download();
                 return Readable.from(await downloadedFile);
             },
             storeFile: async (filename, stream) => {
                 const uploadStream = constructGCSFileReference(
-                    bucket,
+                    await getBucket(),
                     filename,
                 ).createWriteStream();
                 await pipeline(stream, uploadStream);
