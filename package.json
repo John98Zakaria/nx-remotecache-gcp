@@ -29,7 +29,7 @@
   },
   "homepage": "github.com/John98Zakaria/nx-remotecache-gcp#readme",
   "devDependencies": {
-    "@types/node": "~18.19.4",
+    "@types/node": "~22.5.4",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
     "eslint": "^8.57.0",
