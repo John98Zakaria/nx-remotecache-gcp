@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^7.12.1",
-    "@nx/workspace": "^19.0.6",
+    "@nx/workspace": "^20.1.2",
     "nx-remotecache-custom": "^19.0.0"
   },
   "files": [
