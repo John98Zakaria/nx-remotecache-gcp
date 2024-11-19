@@ -1,6 +1,6 @@
 {
   "name": "nx-remotecache-gcp",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Remote caching for @nrwl/nx using Google Cloud Buckets",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
